@@ -45,6 +45,8 @@ export const slis = [
 export const cases = [
   {
     id: "live-sports",
+    metric: "20–30M",
+    metricLabel: "concurrent viewers at peak",
     title: "Live sports for 20–30M concurrent viewers",
     org: "NBCUniversal · Peacock",
     context:
@@ -57,6 +59,8 @@ export const cases = [
   },
   {
     id: "regulated-bank",
+    metric: "99.99%",
+    metricLabel: "banking-core availability",
     title: "A fintech becoming a regulated bank, at 99.99%",
     org: "Covalto",
     context:
@@ -68,6 +72,8 @@ export const cases = [
   },
   {
     id: "from-scratch",
+    metric: "0 → 1",
+    metricLabel: "cloud platform, multi-account AWS",
     title: "A cloud platform from zero",
     org: "GoExpedi",
     context:
@@ -79,6 +85,8 @@ export const cases = [
   },
   {
     id: "ai-platform",
+    metric: "1 door",
+    metricLabel: "LLM access for every team",
     title: "One AI gateway for every team",
     org: "Platform engineering",
     context:
@@ -142,3 +150,47 @@ export const stack = {
   "Security & compliance": ["HashiCorp Vault", "CNBV", "SOC 2", "GDPR"],
   Languages: ["Go", "Python", "Bash", "TypeScript"],
 };
+
+export type Span = {
+  org: string;
+  role: string;
+  start: string;
+  end: string | null;
+  kind: "core" | "early" | "oss";
+  place?: string;
+  attrs?: string[];
+  events?: string[];
+};
+
+export const trace: Span[] = [
+  {
+    org: "NBCUniversal · Peacock", role: "Senior Site Reliability Engineer", start: "2022-11", end: null, kind: "core",
+    place: "New York (remote)", attrs: ["AWS", "GCP", "Prometheus", "Thanos", "Loki", "Grafana"],
+    events: ["Live sports peaks of 20–30M concurrent users", "Multi-region across Europe, Africa and the Americas", "AWS ↔ GCP network and security layers", "Observability stack product teams rely on"],
+  },
+  {
+    org: "Open source", role: "ark-cli · harness-creator · harness-daemon · harness-ui", start: "2025-10", end: null, kind: "oss",
+    place: "github.com/andresgarcia29", attrs: ["Go", "TypeScript", "Shell", "Claude Code"],
+    events: ["ark-cli: every EKS cluster into kubeconfig from one SSO login", "harness: agentic engineering with deterministic gates"],
+  },
+  {
+    org: "Covalto", role: "DevOps Lead", start: "2021-11", end: "2022-11", kind: "core",
+    place: "Mexico City (remote)", attrs: ["GitOps", "Go", "Python", "CNBV"],
+    events: ["Banco Finterra acquisition: fintech → regulated bank", "CNBV security and data-sovereignty architecture", "99.99% availability on critical banking cores"],
+  },
+  {
+    org: "GoExpedi", role: "Senior DevOps Engineer", start: "2020-08", end: "2021-11", kind: "core",
+    place: "Houston, TX", attrs: ["AWS", "Terraform", "Docker", "CI/CD"],
+    events: ["Cloud platform from scratch: multi-account AWS on Terraform", "Monoliths → microservices", "Security for enterprise B2B transactions"],
+  },
+  {
+    org: "Rever", role: "DevOps Engineer", start: "2018-12", end: "2020-08", kind: "core",
+    place: "San Francisco, CA", attrs: ["Data lake", "GDPR"],
+    events: ["Data warehouse and data lake from scratch", "GDPR for international operations", "Engineering grew from 2 to 30+"],
+  },
+  { org: "Digitt", role: "Data Scientist", start: "2018-04", end: "2018-12", kind: "early", attrs: ["Python", "Spark", "TensorFlow", "AWS"] },
+  { org: "Agave Lab", role: "Back-end Developer", start: "2018-01", end: "2018-05", kind: "early", attrs: ["Node.js", "Kubernetes", "gRPC", "PostgreSQL"] },
+  { org: "Tecnológico de Monterrey", role: "Machine Learning Developer", start: "2017-10", end: "2018-03", kind: "early", attrs: ["Python", "NLP"] },
+  { org: "Kukumi", role: "Full Stack Developer", start: "2017-05", end: "2017-12", kind: "early", attrs: ["Node.js", "Docker", "AWS"] },
+  { org: "MAXCOOL", role: "Full Stack Developer", start: "2016-07", end: "2017-08", kind: "early", attrs: ["Python", "Django", "PostgreSQL"] },
+];

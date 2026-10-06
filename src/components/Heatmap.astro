@@ -2,6 +2,17 @@
 interface Day { d: string; c: number; l: number }
 interface Props { weeks: Day[][]; total: number }
 const { weeks, total } = Astro.props;
+const days = weeks.flat();
+const busiest = days.reduce((m, d) => (d.c > m.c ? d : m), days[0] ?? { d: "", c: 0, l: 0 });
+let longest = 0, run = 0;
+for (const d of days) { run = d.c > 0 ? run + 1 : 0; longest = Math.max(longest, run); }
+let current = 0;
+for (let i = days.length - 1; i >= 0; i--) {
+  if (days[i].c > 0) current++;
+  else if (i < days.length - 1) break;
+}
+const active = days.filter((d) => d.c > 0).length;
+const day = (iso: string) => iso && new Date(`${iso}T00:00:00Z`).toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" });
 ---
 <div class="heatmap" role="img" aria-label={`${total.toLocaleString("en-US")} contributions in the last year`}>
   {weeks.map((week, w) => (
@@ -10,6 +21,12 @@ const { weeks, total } = Astro.props;
     </div>
   ))}
 </div>
+<dl class="hstats mono">
+  <div><dt>busiest day</dt><dd>{busiest.c} <span>on {day(busiest.d)}</span></dd></div>
+  <div><dt>longest streak</dt><dd>{longest} <span>days</span></dd></div>
+  <div><dt>current streak</dt><dd>{current} <span>days</span></dd></div>
+  <div><dt>active days</dt><dd>{active} <span>/ {days.length}</span></dd></div>
+</dl>
 <div class="legend mono" aria-hidden="true">
   less <i data-l="0"></i><i data-l="1"></i><i data-l="2"></i><i data-l="3"></i><i data-l="4"></i> more
 </div>
@@ -24,6 +41,11 @@ const { weeks, total } = Astro.props;
   i[data-l="4"] { background: var(--heat-4); }
   .heatmap i:hover { outline: 1px solid var(--text); }
   @keyframes fade { from { opacity: 0; } }
-  .legend { display: flex; align-items: center; justify-content: flex-end; gap: 3px; font-size: 11px; color: var(--muted); }
+  .hstats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 18px 0 0; padding-top: 16px; border-top: 1px solid var(--border); }
+  .hstats dt { font-size: 10px; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); }
+  .hstats dd { margin: 4px 0 0; font-size: 22px; font-weight: 700; color: var(--text); letter-spacing: -0.03em; }
+  .hstats dd span { font-size: 11px; font-weight: 400; color: var(--muted); letter-spacing: 0; }
+  @media (max-width: 560px) { .hstats { grid-template-columns: 1fr 1fr; } }
+  .legend { margin-top: 12px; display: flex; align-items: center; justify-content: flex-end; gap: 3px; font-size: 11px; color: var(--muted); }
   .legend i { width: 10px; }
 </style>
