@@ -259,14 +259,14 @@ const shipped = [...gh.repos]
   .avatar img { position: absolute; inset: 3px; width: calc(100% - 6px); height: calc(100% - 6px); border-radius: 50%; object-fit: cover; border: 3px solid var(--surface); }
   .mono-layer { filter: grayscale(1) contrast(1.15) brightness(.8); }
   .avatar::after { content: ""; position: absolute; inset: 6px; border-radius: 50%; z-index: 1; pointer-events: none; mix-blend-mode: color;
-    background: linear-gradient(160deg, var(--brand), var(--brand-2)); animation: fade .6s var(--ease) 2.6s forwards; }
+    background: linear-gradient(160deg, var(--brand), var(--brand-2)); animation: tint-out .6s var(--ease) 2.6s forwards; }
   .color-layer { z-index: 2; clip-path: inset(0 0 100% 0); animation: scan 1.1s var(--ease) 1.6s forwards; }
   .avatar::before { content: ""; position: absolute; left: 6px; right: 6px; top: 6px; height: 2px; z-index: 3; border-radius: 2px; opacity: 0; pointer-events: none;
     background: linear-gradient(90deg, transparent, #fff, transparent); box-shadow: 0 0 12px 2px var(--brand);
     animation: beam 1.1s var(--ease) 1.6s; }
   @keyframes scan { to { clip-path: inset(0); } }
   @keyframes beam { 0% { opacity: 1; top: 6px; } 90% { opacity: 1; } 100% { opacity: 0; top: calc(100% - 8px); } }
-  @keyframes fade { to { opacity: 0; } }
+  @keyframes tint-out { to { opacity: 0; } }
   .presence { position: absolute; right: 14px; bottom: 14px; z-index: 4; width: 16px; height: 16px; border-radius: 50%;
     background: var(--ok); border: 3px solid var(--surface); }
   .presence::after { content: ""; position: absolute; inset: -3px; border-radius: 50%; animation: pulse 2.4s var(--ease) infinite; }
