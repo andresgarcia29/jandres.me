@@ -11,7 +11,7 @@ const { title = meta.title, description = meta.description } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const sha = (import.meta.env.PUBLIC_COMMIT_SHA ?? "local").slice(0, 7);
 const builtAt = import.meta.env.PUBLIC_BUILT_AT ?? new Date().toISOString();
-const nav = [["work", "Work"], ["trace", "Career"], ["projects", "Projects"], ["contact", "Contact"]];
+const nav = [["about", "Summary"], ["work", "Experience"], ["projects", "Projects"], ["activity", "Activity"], ["contact", "Contact"]];
 ---
 <!doctype html>
 <html lang="en" style="color-scheme: dark">
