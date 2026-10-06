@@ -1,0 +1,21 @@
+---
+import Base from "../layouts/Base.astro";
+---
+<Base title="404 — jandres.me">
+  <section class="wrap nf">
+    <pre class="mono"><span class="p">$</span> kubectl get page <span data-path>/missing</span>
+<span class="err">Error from server (NotFound): pages "<span data-path>/missing</span>" not found</span></pre>
+    <p class="lead">This page isn't in the cluster. The rest of the site is operational.</p>
+    <a class="btn primary" href="/">← Back to the status page</a>
+  </section>
+  <script is:inline>
+    document.querySelectorAll("[data-path]").forEach((el) => (el.textContent = location.pathname));
+  </script>
+</Base>
+
+<style>
+  .nf { min-height: 60vh; padding-top: 96px; }
+  pre { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; overflow-x: auto; white-space: pre-wrap; }
+  .p { color: var(--violet); }
+  .err { color: light-dark(#cf222e, #f85149); }
+</style>

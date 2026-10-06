@@ -1,0 +1,114 @@
+---
+import { person } from "../content/site";
+import gh from "../data/github.json";
+
+const commands = [
+  { cmd: "work", hint: "Jump to case studies", href: "/#work" },
+  { cmd: "projects", hint: "Open-source I maintain", href: "/#projects" },
+  { cmd: "runbook", hint: "How I work", href: "/#runbook" },
+  { cmd: "contact", hint: "Get in touch", href: "/#contact" },
+  { cmd: "email", hint: `Copy ${person.email}`, copy: person.email },
+  { cmd: "cv", hint: "Download my CV (PDF)", href: person.cv },
+  { cmd: "github", hint: "github.com/andresgarcia29", href: person.github },
+  { cmd: "linkedin", hint: "linkedin.com/in/andres-garcia-sre", href: person.linkedin },
+  { cmd: "theme", hint: "Toggle light / dark", action: "theme" },
+  {
+    cmd: "whoami",
+    hint: "Print a summary",
+    print: `${person.name} · ${person.role} · ${person.experience} · ${person.location} · ${gh.total.toLocaleString("en-US")} contributions in the last year`,
+  },
+];
+---
+<dialog class="palette" aria-label="Command palette">
+  <form method="dialog" class="prompt">
+    <label class="mono" for="palette-input">$</label>
+    <input id="palette-input" class="mono" type="text" autocomplete="off" spellcheck="false"
+      placeholder="type a command…  (help, whoami, cv, email)" role="combobox"
+      aria-controls="palette-list" aria-expanded="true" />
+    <kbd class="mono">esc</kbd>
+  </form>
+  <ul id="palette-list" role="listbox">
+    {commands.map((c) => (
+      <li role="option" aria-selected="false" data-cmd={c.cmd} data-href={c.href} data-copy={c.copy}
+          data-action={c.action} data-print={c.print}>
+        <span class="mono cmd">{c.cmd}</span><span class="muted">{c.hint}</span>
+      </li>
+    ))}
+  </ul>
+  <output class="mono out" aria-live="polite"></output>
+</dialog>
+
+<script>
+  const dlg = document.querySelector<HTMLDialogElement>("dialog.palette")!;
+  const input = dlg.querySelector("input")!;
+  const items = [...dlg.querySelectorAll<HTMLLIElement>("li")];
+  const out = dlg.querySelector("output")!;
+  let active = 0;
+
+  const visible = () => items.filter((li) => !li.hidden);
+  function select(i: number) {
+    const v = visible();
+    if (!v.length) return;
+    active = (i + v.length) % v.length;
+    v.forEach((li, j) => li.setAttribute("aria-selected", String(j === active)));
+    v[active].scrollIntoView({ block: "nearest" });
+  }
+  function filter() {
+    const q = input.value.trim().toLowerCase();
+    items.forEach((li) => (li.hidden = !!q && q !== "help" && !li.dataset.cmd!.includes(q) && !li.textContent!.toLowerCase().includes(q)));
+    out.textContent = visible().length ? "" : `command not found: ${q} — try "help"`;
+    select(0);
+  }
+  function run(li: HTMLLIElement) {
+    const { href, copy, action, print } = li.dataset;
+    if (print) { out.textContent = print; return; }
+    if (copy) { navigator.clipboard?.writeText(copy); out.textContent = `copied ${copy}`; return; }
+    if (action === "theme") { (document.querySelector("[data-theme-toggle]") as HTMLButtonElement)?.click(); return; }
+    if (href) {
+      dlg.close();
+      if (href.startsWith("http")) window.open(href, "_blank", "noopener");
+      else location.href = href;
+    }
+  }
+  function open() {
+    input.value = ""; out.textContent = ""; filter();
+    dlg.showModal(); input.focus();
+  }
+
+  document.querySelectorAll("[data-open-palette]").forEach((b) => b.addEventListener("click", open));
+  document.addEventListener("keydown", (e) => {
+    const typing = e.target instanceof Element && e.target.closest("input, textarea, [contenteditable]");
+    if (((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") || (e.key === "/" && !typing)) {
+      e.preventDefault();
+      dlg.open ? dlg.close() : open();
+    }
+  });
+  input.addEventListener("input", filter);
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "ArrowDown") { e.preventDefault(); select(active + 1); }
+    if (e.key === "ArrowUp") { e.preventDefault(); select(active - 1); }
+    if (e.key === "Enter") { e.preventDefault(); const li = visible()[active]; if (li) run(li); }
+  });
+  items.forEach((li) => li.addEventListener("click", () => run(li)));
+  dlg.addEventListener("click", (e) => { if (e.target === dlg) dlg.close(); });
+</script>
+
+<style>
+  .palette {
+    width: min(640px, calc(100vw - 32px)); margin: 12vh auto auto; padding: 0;
+    background: var(--surface); color: var(--text);
+    border: 1px solid var(--border); border-radius: 12px;
+    box-shadow: 0 24px 64px rgb(0 0 0 / .35);
+  }
+  .palette::backdrop { background: rgb(1 4 9 / .55); backdrop-filter: blur(2px); }
+  .prompt { display: flex; align-items: center; gap: 10px; padding: 14px 16px; border-bottom: 1px solid var(--border); }
+  .prompt label { color: var(--violet); font-weight: 700; }
+  .prompt input { flex: 1; background: none; border: 0; color: var(--text); font-size: 15px; outline: none; }
+  .prompt kbd { font-size: 11px; color: var(--muted); border: 1px solid var(--border); border-radius: 4px; padding: 1px 6px; }
+  ul { list-style: none; margin: 0; padding: 6px; max-height: 50vh; overflow: auto; }
+  li { display: flex; gap: 16px; align-items: baseline; padding: 8px 10px; border-radius: 6px; cursor: pointer; font-size: 14px; }
+  li[aria-selected="true"], li:hover { background: color-mix(in srgb, var(--accent) 14%, transparent); }
+  .cmd { color: var(--accent); min-width: 88px; }
+  .out { display: block; padding: 0 16px 14px; font-size: 13px; color: var(--ok); white-space: pre-wrap; }
+  .out:empty { display: none; }
+</style>

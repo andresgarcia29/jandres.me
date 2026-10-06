@@ -1,0 +1,124 @@
+---
+import "@fontsource-variable/inter";
+import "@fontsource-variable/jetbrains-mono";
+import "../styles/global.css";
+import Palette from "../components/Palette.astro";
+import { meta, person } from "../content/site";
+
+interface Props { title?: string; description?: string }
+const { title = meta.title, description = meta.description } = Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const sha = (import.meta.env.PUBLIC_COMMIT_SHA ?? "local").slice(0, 7);
+const builtAt = import.meta.env.PUBLIC_BUILT_AT ?? new Date().toISOString();
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={new URL("/og.png", Astro.site)} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="theme-color" content="#0d1117" />
+    <script is:inline>
+      try { const t = localStorage.getItem("theme"); if (t) document.documentElement.style.colorScheme = t; } catch {}
+    </script>
+  </head>
+  <body>
+    <a class="sr-only" href="#main">Skip to content</a>
+    <header class="site-header">
+      <nav class="wrap" aria-label="Main">
+        <a class="brand mono" href="/"><span class="dot" aria-hidden="true"></span> jandres.me</a>
+        <ul>
+          <li><a href="/#work">Work</a></li>
+          <li><a href="/#projects">Projects</a></li>
+          <li><a href="/#runbook">Runbook</a></li>
+          <li><a href="/#contact">Contact</a></li>
+        </ul>
+        <div class="tools">
+          <button class="icon-btn mono" type="button" data-open-palette aria-label="⌘K: open command palette">
+            <kbd>⌘K</kbd>
+          </button>
+          <button class="icon-btn" type="button" data-theme-toggle aria-label="Toggle color theme">
+            <svg class="sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+            <svg class="moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+          </button>
+        </div>
+      </nav>
+    </header>
+
+    <main id="main"><slot /></main>
+
+    <footer class="site-footer">
+      <div class="wrap mono">
+        <span>© {new Date().getFullYear()} {person.name}</span>
+        <span>
+          Astro · Cloudflare · data refreshed every 6h by GitHub Actions ·
+          build <a href={`https://github.com/andresgarcia29/jandres.me/commit/${sha}`}>{sha}</a>
+          <span data-ts={builtAt}></span> ·
+          <a href="https://github.com/andresgarcia29/jandres.me">source</a>
+        </span>
+      </div>
+    </footer>
+
+    <Palette />
+
+    <script is:inline>
+      const rtf = new Intl.RelativeTimeFormat("en", { numeric: "auto" });
+      const units = [["year", 31536e3], ["month", 2592e3], ["day", 864e2], ["hour", 3600], ["minute", 60]];
+      document.querySelectorAll("[data-ts]").forEach((el) => {
+        const s = (new Date(el.dataset.ts) - Date.now()) / 1000;
+        const [unit, size] = units.find(([, n]) => Math.abs(s) >= n) ?? ["minute", 60];
+        el.textContent = (el.dataset.prefix ?? "") + rtf.format(Math.round(s / size), unit);
+        el.title = new Date(el.dataset.ts).toUTCString();
+      });
+      document.querySelector("[data-theme-toggle]")?.addEventListener("click", () => {
+        const root = document.documentElement;
+        const dark = root.style.colorScheme ? root.style.colorScheme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+        root.style.colorScheme = dark ? "light" : "dark";
+        try { localStorage.setItem("theme", root.style.colorScheme); } catch {}
+      });
+    </script>
+  </body>
+</html>
+
+<style>
+  .site-header {
+    position: sticky; top: 0; z-index: 10;
+    background: color-mix(in srgb, var(--bg) 85%, transparent);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--border);
+  }
+  nav { display: flex; align-items: center; gap: 24px; height: 56px; }
+  .brand { display: flex; align-items: center; gap: 10px; color: var(--text); text-decoration: none; font-weight: 600; }
+  nav ul { display: flex; gap: 20px; list-style: none; margin: 0 auto 0 0; padding: 0; }
+  nav ul a { color: var(--muted); text-decoration: none; font-size: 14px; }
+  nav ul a:hover { color: var(--text); }
+  .tools { display: flex; gap: 8px; }
+  .icon-btn {
+    display: inline-flex; align-items: center; justify-content: center; min-width: 36px; height: 32px; padding: 0 8px;
+    border: 1px solid var(--border); border-radius: 6px; background: var(--surface); color: var(--muted); cursor: pointer;
+  }
+  .icon-btn:hover { color: var(--text); border-color: var(--accent); }
+  .icon-btn kbd { font-size: 12px; }
+  .icon-btn svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
+  .moon { display: none; }
+  :global(html[style*="light"]) .sun { display: none; }
+  :global(html[style*="light"]) .moon { display: block; }
+  @media (prefers-color-scheme: light) {
+    :global(html:not([style*="dark"])) .sun { display: none; }
+    :global(html:not([style*="dark"])) .moon { display: block; }
+  }
+  @media (max-width: 640px) { nav ul { display: none; } nav { justify-content: space-between; } }
+  .site-footer { border-top: 1px solid var(--border); padding: 24px 0; font-size: 12px; color: var(--muted); }
+  .site-footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; }
+  .site-footer a { color: var(--muted); }
+</style>

@@ -1,0 +1,67 @@
+name: site
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "17 */6 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: site
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      HAS_CLOUDFLARE: ${{ secrets.CLOUDFLARE_API_TOKEN != '' }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - run: sudo apt-get install -y --no-install-recommends poppler-utils
+
+      - name: Confidentiality gate (source + history)
+        run: npm run check
+
+      - name: Refresh GitHub data
+        if: github.event_name != 'push'
+        run: node scripts/fetch-github.mjs
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+
+      - name: Commit refreshed data
+        if: github.event_name != 'push'
+        run: |
+          git diff --quiet src/data && exit 0
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -am "data: refresh GitHub activity"
+          git push
+
+      - name: Build
+        run: npm run build
+        env:
+          PUBLIC_COMMIT_SHA: ${{ github.sha }}
+
+      - name: Confidentiality gate (built site)
+        run: bash scripts/check-terms.sh dist
+
+      - uses: cloudflare/wrangler-action@v4
+        if: env.HAS_CLOUDFLARE == 'true'
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: deploy
