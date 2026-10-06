@@ -1,7 +1,6 @@
 ---
-import "@fontsource-variable/martian-mono";
 import "@fontsource-variable/geist";
-import "@fontsource/instrument-serif/latin-400-italic.css";
+import "@fontsource-variable/geist-mono";
 import "../styles/global.css";
 import Palette from "../components/Palette.astro";
 import { meta, person } from "../content/site";
@@ -29,14 +28,13 @@ const nav = [["about", "Summary"], ["work", "Experience"], ["projects", "Project
     <meta property="og:description" content={description} />
     <meta property="og:image" content={new URL("/og.png", Astro.site)} />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="theme-color" content="#06080b" />
+    <meta name="theme-color" content="#08090a" />
     <script is:inline>
       try { const t = localStorage.getItem("theme"); if (t) document.documentElement.style.colorScheme = t; } catch {}
     </script>
   </head>
   <body>
     <div class="progress" aria-hidden="true"></div>
-    <div class="grain" aria-hidden="true"></div>
     <a class="sr-only" href="#main">Skip to content</a>
     <header class="site-header">
       <nav class="wrap" aria-label="Main">
@@ -116,22 +114,22 @@ const nav = [["about", "Summary"], ["work", "Experience"], ["projects", "Project
     max-width: calc(var(--max) - 48px); padding-inline: 12px 8px;
     background: color-mix(in srgb, var(--surface) 72%, transparent);
     backdrop-filter: blur(14px) saturate(1.4);
-    border: 1px solid var(--border); border-radius: 999px;
-    box-shadow: 0 10px 40px -20px rgb(0 0 0 / .6);
+    border: 1px solid var(--border); border-radius: 14px;
+    box-shadow: var(--shadow);
   }
   .brand { display: flex; align-items: center; gap: 10px; padding-left: 10px; color: var(--text); text-decoration: none; font-size: 14px; font-weight: 600; }
-  .tld { color: var(--ok); }
+  .tld { color: var(--muted); }
   nav ul { display: flex; gap: 4px; list-style: none; margin: 0 auto 0 0; padding: 0; }
-  nav ul a { display: block; padding: 6px 12px; border-radius: 999px; color: var(--muted); text-decoration: none; font-size: 14px; transition: color .2s, background .2s; }
+  nav ul a { display: block; padding: 6px 12px; border-radius: 8px; color: var(--muted); text-decoration: none; font-size: 14px; transition: color .2s, background .2s; }
   nav ul a:hover { color: var(--text); }
-  nav ul a[aria-current] { color: var(--text); background: color-mix(in srgb, var(--ok) 14%, transparent); }
+  nav ul a[aria-current] { color: var(--text); background: color-mix(in srgb, var(--text) 7%, transparent); }
   .tools { display: flex; gap: 6px; }
   .icon-btn {
     display: inline-flex; align-items: center; justify-content: center; min-width: 38px; height: 38px; padding: 0 10px;
-    border: 1px solid var(--border); border-radius: 999px; background: transparent; color: var(--muted); cursor: pointer;
+    border: 1px solid var(--border); border-radius: 8px; background: transparent; color: var(--muted); cursor: pointer;
     transition: color .2s, border-color .2s;
   }
-  .icon-btn:hover { color: var(--text); border-color: var(--ok); }
+  .icon-btn:hover { color: var(--text); border-color: var(--brand); }
   .icon-btn kbd { font-size: 11px; }
   .icon-btn svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
   .moon { display: none; }
