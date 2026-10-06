@@ -7,7 +7,7 @@ import gh from "../data/github.json";
 import { getImage } from "astro:assets";
 import photoSrc from "../assets/andres.jpg";
 
-const photo = await getImage({ src: photoSrc, width: 224, height: 224, format: "avif" });
+const photo = await getImage({ src: photoSrc, width: 336, height: 336, format: "avif" });
 
 const fmt = (n: number) => n.toLocaleString("en-US");
 const repo = (name: string) => gh.repos.find((r) => r.name === name);
@@ -37,8 +37,8 @@ const shipped = [...gh.repos]
         <p class="cmd mono"><span class="prompt">$</span> <span class="typed" style="--n:32">kubectl describe engineer andres</span></p>
         <div class="avatar" aria-hidden="true">
           <span class="ring"></span>
-          <img class="mono-layer" src={photo.src} width="112" height="112" alt="" />
-          <img class="color-layer" src={photo.src} width="112" height="112" alt="" />
+          <img class="mono-layer" src={photo.src} width="168" height="168" alt="" />
+          <img class="color-layer" src={photo.src} width="168" height="168" alt="" />
           <span class="presence"></span>
         </div>
         <h1>{person.name}</h1>
@@ -249,7 +249,7 @@ const shipped = [...gh.repos]
     width: calc(var(--n) * 1ch); animation: type 1.3s steps(var(--n)) .3s both; }
   @keyframes type { from { width: 0; } }
   /* Avatar: indigo scan resolves the photo to color once the kubectl line finishes typing. */
-  .avatar { position: relative; width: 112px; height: 112px; margin: 0 0 20px; border-radius: 50%; isolation: isolate;
+  .avatar { position: relative; width: 168px; height: 168px; margin: 4px auto 24px; border-radius: 50%; isolation: isolate;
     transition: transform .5s var(--ease), box-shadow .5s var(--ease);
     box-shadow: 0 0 0 1px var(--border), 0 18px 40px -18px color-mix(in srgb, var(--brand) 70%, transparent); }
   .avatar:hover { transform: translateY(-2px) scale(1.03); box-shadow: 0 0 0 1px var(--border-hi), 0 22px 54px -14px color-mix(in srgb, var(--brand-2) 80%, transparent); }
@@ -267,7 +267,7 @@ const shipped = [...gh.repos]
   @keyframes scan { to { clip-path: inset(0); } }
   @keyframes beam { 0% { opacity: 1; top: 6px; } 90% { opacity: 1; } 100% { opacity: 0; top: calc(100% - 8px); } }
   @keyframes fade { to { opacity: 0; } }
-  .presence { position: absolute; right: 8px; bottom: 8px; z-index: 4; width: 16px; height: 16px; border-radius: 50%;
+  .presence { position: absolute; right: 14px; bottom: 14px; z-index: 4; width: 16px; height: 16px; border-radius: 50%;
     background: var(--ok); border: 3px solid var(--surface); }
   .presence::after { content: ""; position: absolute; inset: -3px; border-radius: 50%; animation: pulse 2.4s var(--ease) infinite; }
   @media (prefers-reduced-motion: reduce) {
